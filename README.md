@@ -3,7 +3,7 @@ http://env-4867079.jelastic.metropolia.fi
 
 Example requests
 
-all:
+all stations:
 http://env-4867079.jelastic.metropolia.fi/station
 
 search by Id:
