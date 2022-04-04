@@ -3,6 +3,7 @@ import express  from 'express';
 import dotenv from 'dotenv';
 dotenv.config();
 import https from 'https';
+import http from 'http';
 import fs from 'fs';
 import stationRoute from './routes/stationRoute'
 import authRoute from './routes/authRoute'
@@ -10,6 +11,7 @@ import passport from './utils/pass';
 import db from './utils/db';
 const app = express();
 const port = process.env.PORT || 3000;
+const httpsPort = process.env.httpsPort;
 
 const sslkey = fs.readFileSync('ssl-key.pem');
 const sslcert = fs.readFileSync('ssl-cert.pem')
@@ -35,7 +37,13 @@ app.use('/auth', authRoute);
 
 db.on('connected', () => {
 	// app.listen(port, () => console.log(`Example app listening on port ${port}!`));
-	https.createServer(options, app).listen(8000);
+	https.createServer(options, app).listen(httpsPort);
+
+	http.createServer((req, res) => {
+		res.writeHead(301, { 'Location': `https://localhost:${httpsPort}` + req.url });
+		res.end();
+  }).listen(3000);
+  
 }).on('error', (err) => {
 	console.log(`Connection error: ${err.message}`);
 });
