@@ -2,9 +2,10 @@
 import passport from 'passport';
 import Strategy from 'passport-local';
 import {Strategy as JWTStrategy, ExtractJwt} from 'passport-jwt';
+import bcrypt from 'bcrypt';
 import {getUserLogin} from '../models/userModel';
 
-// serialize: store user id in session 
+// serialize: store user id in session
 /*
 passport.serializeUser((user, done) => {
     console.log('serialize', user);
@@ -22,13 +23,13 @@ passport.deserializeUser(async (user, done) => {
 */
 
 passport.use(
-    new Strategy((username, password, done) => { // the html form must have the same name as input (username, password)
+    new Strategy(async (username, password, done) => { // the html form must have the same name as input (username, password)
         // get user by username (in this case email) from userModel/getUserLogin
         const user = getUserLogin(username);
         if(!user){
             return done(null, false);
         }
-        if(password !== user.password){
+        if(!await bcrypt.compare(password, user.password)){
             return done(null, false);
         }
         delete user.password; //we don't want the password to travel from server to client
