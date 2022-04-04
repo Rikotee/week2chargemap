@@ -11,15 +11,6 @@ import passport from './utils/pass';
 import db from './utils/db';
 const app = express();
 const port = process.env.PORT || 3000;
-const httpsPort = process.env.httpsPort;
-
-const sslkey = fs.readFileSync('ssl-key.pem');
-const sslcert = fs.readFileSync('ssl-cert.pem')
-
-const options = {
-      key: sslkey,
-      cert: sslcert
-};
 
 app.use(passport.initialize());
 
@@ -36,14 +27,7 @@ app.use('/station', stationRoute); //passport.authenticate('jwt', {session: fals
 app.use('/auth', authRoute);
 
 db.on('connected', () => {
-	// app.listen(port, () => console.log(`Example app listening on port ${port}!`));
-	https.createServer(options, app).listen(httpsPort);
-
-	http.createServer((req, res) => {
-		res.writeHead(301, { 'Location': `https://localhost:${httpsPort}` + req.url });
-		res.end();
-  }).listen(3000);
-  
+	(async () => (await import('./utils/localhost')).default(app, port))();
 }).on('error', (err) => {
 	console.log(`Connection error: ${err.message}`);
 });
