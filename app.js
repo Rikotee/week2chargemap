@@ -2,6 +2,7 @@
 import express  from 'express';
 import dotenv from 'dotenv';
 dotenv.config();
+import helmet from 'helmet';
 import stationRoute from './routes/stationRoute'
 import authRoute from './routes/authRoute'
 import passport from './utils/pass';
@@ -11,7 +12,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(passport.initialize());
-
+app.use(helmet());
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 app.get('/', async (req, res) => {
